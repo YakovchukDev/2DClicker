@@ -1,5 +1,6 @@
 using System;
 using Entities;
+using Views;
 using UnityEngine;
 
 namespace Controllers
@@ -15,30 +16,32 @@ namespace Controllers
 
         private void OnEnable()
         {
-            Horse.OnHorseClicked += AddValueToBalance;
+            HorseView.OnHorseClicked += AddValueToBalance;
             UpgradeController.OnBuy += RemoveValueToBalance;
-            UpgradeController.OnGetBalanceValue += OnGetBalanceValue;
+            UpgradeController.OnGetBalanceValue += GetBalanceValue;
             Minion.AddValueToBalance += AddValueToBalance;
             UpgradeController.AddNewMinion += RecalculationEverySecondsIncome;
         }
         private void OnDisable()
         {
-            Horse.OnHorseClicked -= AddValueToBalance;
+            HorseView.OnHorseClicked -= AddValueToBalance;
             UpgradeController.OnBuy -= RemoveValueToBalance;
-            UpgradeController.OnGetBalanceValue -= OnGetBalanceValue;
+            UpgradeController.OnGetBalanceValue -= GetBalanceValue;
             Minion.AddValueToBalance -= AddValueToBalance;
             UpgradeController.AddNewMinion -= RecalculationEverySecondsIncome;
         }
         private void Start()
         {
-            _balanceCount = 0;
             UpdateBalanceView?.Invoke(_balanceCount);
             UpdateBananasPerSecondView?.Invoke((ulong)(Math.Round((decimal)(_minions.GetValue() *
                                                                             ((OnGetMinionsCount?.Invoke())) /
                                                                             _minions.GetIntervalInSeconds()))));
         }
-        private ulong OnGetBalanceValue() => _balanceCount;
-
+        public ulong GetBalanceValue() => _balanceCount;
+        public void SetBalanceValue(ulong balanceCount)
+        {
+            _balanceCount = balanceCount;
+        }
         private void AddValueToBalance(ulong value)
         {
             _balanceCount += value;

@@ -5,10 +5,11 @@ namespace Entities
 {
     public class Minion : MonoBehaviour
     {
-        public static event Action<ulong> AddValueToBalance;
-        [SerializeField] private int _value;
+        [SerializeField] private AddBananasAnimation _addBananasAnimation;
+        [SerializeField] private int _modifierValue;
         [SerializeField] private int _intervalInSeconds;
         private float _time;
+        public static event Action<ulong> AddValueToBalance;
 
         private void Start()
         {
@@ -19,12 +20,13 @@ namespace Entities
             _time += Time.deltaTime;
             if (_time >= _intervalInSeconds)
             {
-                AddValueToBalance?.Invoke((ulong)_value);
+                AddValueToBalance?.Invoke((ulong)_modifierValue);
                 _time -= _intervalInSeconds;
+                _addBananasAnimation.Play((ulong)_modifierValue);
             }
         }
 
         public int GetIntervalInSeconds() => _intervalInSeconds;
-        public int GetValue() => _value;
+        public int GetValue() => _modifierValue;
     }
 }

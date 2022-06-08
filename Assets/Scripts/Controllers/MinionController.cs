@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Controllers
 {
@@ -7,26 +9,39 @@ namespace Controllers
     {
         [SerializeField] private List<RectTransform> _sides;
         [SerializeField] private RectTransform _minion;
-        private ushort _minionsCount = 0;
+        private ushort _minionsCount;
 
         private void OnEnable()
         {
-            BalanceController.OnGetMinionsCount += GetMinionCount;
-            UpgradeController.OnGetMinionCount += GetMinionCount;
+            BalanceController.OnGetMinionsCount += GetMinionsCount;
+            UpgradeController.OnGetMinionCount += GetMinionsCount;
             UpgradeController.AddNewMinion += AddNewMinion;
         }
         private void OnDisable()
         {
-            BalanceController.OnGetMinionsCount -= GetMinionCount;
-            UpgradeController.OnGetMinionCount -= GetMinionCount;
+            BalanceController.OnGetMinionsCount -= GetMinionsCount;
+            UpgradeController.OnGetMinionCount -= GetMinionsCount;
             UpgradeController.AddNewMinion -= AddNewMinion;
         }
-        private ushort GetMinionCount() => _minionsCount;
+
+        private void Start()
+        {
+            for (int i = 0; i < _minionsCount; i++)
+            {
+                AddNewMinion();
+                _minionsCount--;
+            }
+        }
+
+        public ushort GetMinionsCount() => _minionsCount;
+        public void SetMinionsCount(ushort minionsCount)
+        {
+            _minionsCount = minionsCount;
+        }
         private void AddNewMinion()
         {
             _minionsCount++;
             RectTransform currentSide = _sides[Random.Range(0, _sides.Count)];
-            Instantiate(_minion, currentSide);
             _minion.position = new Vector2
             (
                 Random.Range
@@ -40,6 +55,8 @@ namespace Controllers
                     currentSide.rect.height / 2
                 )
             );
+            Debug.Log(_minion.position);
+            Instantiate(_minion, currentSide);
         }
 
     }

@@ -16,8 +16,8 @@ namespace Controllers
         public static event GetValue OnGetBalanceValue;
         public static event GetUshortValue OnGetMinionCount;
         public static event Action<ulong> OnBuy;
-        [SerializeField] private ulong _improvementCostClick;
-        [SerializeField] private ulong _costNewMinion;
+        private ulong _improvementCostClick;
+        private ulong _costNewMinion;
 
         private void Start()
         {
@@ -43,6 +43,17 @@ namespace Controllers
                 AddNewMinion?.Invoke();
                 UpdateBuyNewMinion?.Invoke((ulong)OnGetMinionCount?.Invoke(), _costNewMinion);
             }
+        }
+
+        public ulong GetImprovementCostClick() => _improvementCostClick;
+        public ulong GetCostNewMinion() => _costNewMinion;
+        public void SetImprovementCostClick(ulong improvementCostClick)
+        {
+            _improvementCostClick = improvementCostClick;
+        }
+        public void SetCostNewMinion(ulong costNewMinion)
+        {
+            _costNewMinion = costNewMinion;
         }
     }
 }
