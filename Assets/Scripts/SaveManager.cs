@@ -9,6 +9,7 @@ public class SaveManager : MonoBehaviour
     [SerializeField] private BalanceController _balanceController;
     [SerializeField] private MinionController _minionController;
     [SerializeField] private UpgradeController _upgradeController;
+    [SerializeField] private PauseManager _pauseManager;
     [SerializeField] private int _timeInterval;
     private GameData _gameData;
     private string _path;
@@ -34,6 +35,18 @@ public class SaveManager : MonoBehaviour
             _time -= _timeInterval;
         }
     }
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+        {
+            SaveData();
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveData();
+    }
 
     private void SaveData()
     {
@@ -44,15 +57,15 @@ public class SaveManager : MonoBehaviour
             _gameData.MinionsCount = _minionController.GetMinionsCount();
             _gameData.CostOfImprovingClickPower = _upgradeController.GetImprovementCostClick();
             _gameData.NewMinionCost = _upgradeController.GetCostNewMinion();
-            _gameData.IsMusic = true;
-            _gameData.IsSounds = true;
+            _gameData.MusicToggle = _pauseManager.GetMusicToglle();
+            _gameData.SoundsToggle = _pauseManager.GetSoundsToglle();
         }
         else
         {
             _gameData = new GameData();
         }
-
         File.WriteAllText(_path, JsonUtility.ToJson(_gameData));
+        Debug.Log("Save");
     }
     private void LoadData()
     {
@@ -69,8 +82,8 @@ public class SaveManager : MonoBehaviour
         _minionController.SetMinionsCount(_gameData.MinionsCount);
         _upgradeController.SetImprovementCostClick(_gameData.CostOfImprovingClickPower);
         _upgradeController.SetCostNewMinion(_gameData.NewMinionCost);
-        //music
-        //sounds
+        _pauseManager.SetMusicToglle(_gameData.MusicToggle);
+        _pauseManager.SetSoundsToglle(_gameData.SoundsToggle);
     }
     
     [Serializable]
@@ -81,8 +94,8 @@ public class SaveManager : MonoBehaviour
         public ushort MinionsCount;
         public ulong CostOfImprovingClickPower;
         public ulong NewMinionCost;
-        public bool IsMusic;
-        public bool IsSounds;
+        public bool MusicToggle;
+        public bool SoundsToggle;
 
         public GameData()
         {
@@ -91,8 +104,8 @@ public class SaveManager : MonoBehaviour
             MinionsCount = 0;
             CostOfImprovingClickPower = 100;
             NewMinionCost = 100;
-            IsMusic = true;
-            IsSounds = true;
+            MusicToggle = true;
+            SoundsToggle = true;
         }
     }
 }

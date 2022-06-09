@@ -18,7 +18,7 @@ namespace Views
         }
         private void UpdateBananasPerSecondView(ulong value)
         {
-            _bananasPerSecondsText.text = value.ToString();
+            _bananasPerSecondsText.text = TextConverter.GetSourceText(value);;
         }
     }
 }

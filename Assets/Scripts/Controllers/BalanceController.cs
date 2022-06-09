@@ -8,7 +8,9 @@ namespace Controllers
     public class BalanceController : MonoBehaviour
     {
         [SerializeField] private Minion _minions;
-        private ulong _balanceCount;
+        [SerializeField]private ulong _balanceCount;
+        private ulong _lastBalanceCount;
+        private float _time;
         public delegate ushort GetMinionsCount();
         public static event GetMinionsCount OnGetMinionsCount;
         public static event Action<ulong> UpdateBalanceView;
@@ -20,7 +22,6 @@ namespace Controllers
             UpgradeController.OnBuy += RemoveValueToBalance;
             UpgradeController.OnGetBalanceValue += GetBalanceValue;
             Minion.AddValueToBalance += AddValueToBalance;
-            UpgradeController.AddNewMinion += RecalculationEverySecondsIncome;
         }
         private void OnDisable()
         {
@@ -28,19 +29,32 @@ namespace Controllers
             UpgradeController.OnBuy -= RemoveValueToBalance;
             UpgradeController.OnGetBalanceValue -= GetBalanceValue;
             Minion.AddValueToBalance -= AddValueToBalance;
-            UpgradeController.AddNewMinion -= RecalculationEverySecondsIncome;
         }
         private void Start()
         {
+            _lastBalanceCount = _balanceCount;
             UpdateBalanceView?.Invoke(_balanceCount);
             UpdateBananasPerSecondView?.Invoke((ulong)(Math.Round((decimal)(_minions.GetValue() *
                                                                             ((OnGetMinionsCount?.Invoke())) /
                                                                             _minions.GetIntervalInSeconds()))));
         }
+
+        private void FixedUpdate()
+        {
+            _time += Time.deltaTime;
+            if (_time >= 1f)
+            {
+                _time -= 1f;
+                RecalculationEverySecondsIncome(_balanceCount - _lastBalanceCount);
+                _lastBalanceCount = _balanceCount;
+            }
+        }
+
         public ulong GetBalanceValue() => _balanceCount;
         public void SetBalanceValue(ulong balanceCount)
         {
             _balanceCount = balanceCount;
+            _lastBalanceCount = balanceCount;
         }
         private void AddValueToBalance(ulong value)
         {
@@ -50,13 +64,12 @@ namespace Controllers
         private void RemoveValueToBalance(ulong value)
         {
             _balanceCount -= value;
+            _lastBalanceCount -= value;
             UpdateBalanceView?.Invoke(_balanceCount);
         }
-        private void RecalculationEverySecondsIncome()
+        private void RecalculationEverySecondsIncome(ulong bananasPerSecondValue)
         {
-            UpdateBananasPerSecondView?.Invoke((ulong)(Math.Round((decimal)(_minions.GetValue() *
-                                                                            ((OnGetMinionsCount?.Invoke())) /
-                                                                            _minions.GetIntervalInSeconds()))));
+            UpdateBananasPerSecondView?.Invoke(bananasPerSecondValue);
         }
     }
 }

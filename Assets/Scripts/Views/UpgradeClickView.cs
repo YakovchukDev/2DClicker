@@ -20,8 +20,8 @@ namespace Views
         }
         private void UpdateUpgradeClick(ulong powerClick, ulong improvementCostClick)
         {
-            _powerClickText.text = powerClick.ToString();
-            _improvementCostClickText.text = improvementCostClick.ToString();
+            _powerClickText.text = TextConverter.GetSourceText(powerClick);
+            _improvementCostClickText.text = TextConverter.GetSourceText(improvementCostClick);
         }
     }
 }

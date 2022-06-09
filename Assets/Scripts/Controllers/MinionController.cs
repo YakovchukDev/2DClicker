@@ -55,7 +55,6 @@ namespace Controllers
                     currentSide.rect.height / 2
                 )
             );
-            Debug.Log(_minion.position);
             Instantiate(_minion, currentSide);
         }
 

@@ -18,7 +18,7 @@ namespace Entities
         {
             if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Show"))
             {
-                _text.text = $"+{currentModifier}";
+                _text.text = $"+{TextConverter.GetSourceText(currentModifier)}";
                 _animator.Play("Show");
             }
         }

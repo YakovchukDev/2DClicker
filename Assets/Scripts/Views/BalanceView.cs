@@ -19,7 +19,7 @@ namespace Views
         private void UpdateBalanceView(ulong value)
         {
 
-            _balanceText.text = value.ToString();
+            _balanceText.text = TextConverter.GetSourceText(value);
         }
     }
 }
