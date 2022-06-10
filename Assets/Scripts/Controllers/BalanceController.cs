@@ -10,9 +10,10 @@ namespace Controllers
         [SerializeField] private Minion _minions;
         [SerializeField]private ulong _balanceCount;
         private ulong _lastBalanceCount;
-        private float _time;
-        public delegate ushort GetMinionsCount();
-        public static event GetMinionsCount OnGetMinionsCount;
+        private float _incomePerSecondTimeCounter;
+        private int _boost;
+        private int _durationBoost;
+        private float _durationBoostCounter;
         public static event Action<ulong> UpdateBalanceView;
         public static event Action<ulong> UpdateBananasPerSecondView;
 
@@ -20,33 +21,42 @@ namespace Controllers
         {
             HorseView.OnHorseClicked += AddValueToBalance;
             UpgradeController.OnBuy += RemoveValueToBalance;
-            UpgradeController.OnGetBalanceValue += GetBalanceValue;
-            Minion.AddValueToBalance += AddValueToBalance;
+            MinionController.AddValueToBalance += AddValueToBalance;
+            GoldenMinion.OnStartBoost += SetBoostValue;
         }
         private void OnDisable()
         {
             HorseView.OnHorseClicked -= AddValueToBalance;
             UpgradeController.OnBuy -= RemoveValueToBalance;
-            UpgradeController.OnGetBalanceValue -= GetBalanceValue;
-            Minion.AddValueToBalance -= AddValueToBalance;
+            MinionController.AddValueToBalance -= AddValueToBalance;
+            GoldenMinion.OnStartBoost -= SetBoostValue;
         }
         private void Start()
         {
+            _boost = 1;
             _lastBalanceCount = _balanceCount;
             UpdateBalanceView?.Invoke(_balanceCount);
-            UpdateBananasPerSecondView?.Invoke((ulong)(Math.Round((decimal)(_minions.GetValue() *
-                                                                            ((OnGetMinionsCount?.Invoke())) /
-                                                                            _minions.GetIntervalInSeconds()))));
         }
 
         private void FixedUpdate()
         {
-            _time += Time.deltaTime;
-            if (_time >= 1f)
+            _incomePerSecondTimeCounter += Time.deltaTime;
+            if (_incomePerSecondTimeCounter >= 1f)
             {
-                _time -= 1f;
-                RecalculationEverySecondsIncome(_balanceCount - _lastBalanceCount);
+                _incomePerSecondTimeCounter -= 1f;
+                UpdateBananasPerSecondView?.Invoke(_balanceCount - _lastBalanceCount);
                 _lastBalanceCount = _balanceCount;
+            }
+
+            if (_boost > 1)
+            {
+                _durationBoostCounter += Time.deltaTime;
+                if (_durationBoostCounter >= _durationBoost)
+                {
+                    _boost = 1;
+                    _durationBoost = 0;
+                    _durationBoostCounter = 0;
+                }
             }
         }
 
@@ -56,9 +66,15 @@ namespace Controllers
             _balanceCount = balanceCount;
             _lastBalanceCount = balanceCount;
         }
+
+        public void SetBoostValue(int boost, int duration)
+        {
+            _boost = boost;
+            _durationBoost = duration;
+        }
         private void AddValueToBalance(ulong value)
         {
-            _balanceCount += value;
+            _balanceCount += value * (ulong)_boost;
             UpdateBalanceView?.Invoke(_balanceCount);
         }
         private void RemoveValueToBalance(ulong value)
@@ -66,10 +82,6 @@ namespace Controllers
             _balanceCount -= value;
             _lastBalanceCount -= value;
             UpdateBalanceView?.Invoke(_balanceCount);
-        }
-        private void RecalculationEverySecondsIncome(ulong bananasPerSecondValue)
-        {
-            UpdateBananasPerSecondView?.Invoke(bananasPerSecondValue);
         }
     }
 }

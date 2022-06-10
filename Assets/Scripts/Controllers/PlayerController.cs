@@ -1,5 +1,4 @@
 using System;
-using Views;
 using UnityEngine;
 
 namespace Controllers
@@ -13,15 +12,17 @@ namespace Controllers
         private void OnEnable()
         {
             UpgradeController.UpgradeClickValue += UpgradeClickModifier;
-            UpgradeController.OnGetNextClickValue += GetNextClickValue;
         }
         private void OnDisable()
         {
             UpgradeController.UpgradeClickValue -= UpgradeClickModifier;
-            UpgradeController.OnGetNextClickValue -= GetNextClickValue;
         }
 
         public ulong GetModifier() => _currentModifier;
+        public ulong GetNextClickValue()
+        {
+            return (ulong)Math.Round(_currentModifier * _difference);
+        }
         public void SetModifier(ulong modifier)
         {
             _currentModifier = modifier;
@@ -31,10 +32,6 @@ namespace Controllers
         {
             _currentModifier = (ulong)Math.Round(_currentModifier * _difference);
             OnSetCurrentModifier?.Invoke(_currentModifier);
-        }
-        private ulong GetNextClickValue()
-        {
-            return (ulong)Math.Round(_currentModifier * _difference);
         }
     }
 }

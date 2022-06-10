@@ -17,6 +17,6 @@ public class TextConverter
         {
             value /= 10;
         }
-        return $"{Math.Round(value, 3 - remainder)} {_meaningList[(count + 2) / 3]}";
+        return $"{Math.Round(value, 3 - remainder)}{_meaningList[(count + 2) / 3]}";
     }
 }

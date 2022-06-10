@@ -65,7 +65,6 @@ public class SaveManager : MonoBehaviour
             _gameData = new GameData();
         }
         File.WriteAllText(_path, JsonUtility.ToJson(_gameData));
-        Debug.Log("Save");
     }
     private void LoadData()
     {
@@ -91,7 +90,7 @@ public class SaveManager : MonoBehaviour
     {
         public ulong Money;
         public ulong Modifier;
-        public ushort MinionsCount;
+        public uint MinionsCount;
         public ulong CostOfImprovingClickPower;
         public ulong NewMinionCost;
         public bool MusicToggle;

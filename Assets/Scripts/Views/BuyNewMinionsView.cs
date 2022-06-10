@@ -21,8 +21,8 @@ namespace Views
 
         private void UpdateBuyNewMinion(ulong minionCount, ulong costNewMinion)
         {
-            _minionsCountText.text = minionCount.ToString();
-            _costNewMinionText.text = costNewMinion.ToString();
+            _minionsCountText.text = TextConverter.GetSourceText(minionCount);
+            _costNewMinionText.text = TextConverter.GetSourceText(costNewMinion);
         }
     }
 }

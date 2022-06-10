@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using Entities;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -7,56 +7,88 @@ namespace Controllers
 {
     public class MinionController : MonoBehaviour
     {
-        [SerializeField] private List<RectTransform> _sides;
-        [SerializeField] private RectTransform _minion;
-        private ushort _minionsCount;
+        [SerializeField] private Minion _minion;
+        private float _timeCounter;
+        private uint _minionsCount;
+        private int _timeIntervalBoost;
+        private int _durationExpectations;
+        private bool _isActiveExpectations;
+        private float _timeIntervalBostCounter;
+        public static event Action<bool> OnAddNewMinion;
+        public static event Action<uint> OnSetMinions;
+        public static event Action<ulong> AddValueToBalance;
+        public static event Action OnShowGoldenMinion;
+        public static event Action OnHideGoldenMinion;
 
         private void OnEnable()
         {
-            BalanceController.OnGetMinionsCount += GetMinionsCount;
-            UpgradeController.OnGetMinionCount += GetMinionsCount;
             UpgradeController.AddNewMinion += AddNewMinion;
+            GoldenMinion.OnGoldenMinionClick += ResetTimer;
         }
         private void OnDisable()
         {
-            BalanceController.OnGetMinionsCount -= GetMinionsCount;
-            UpgradeController.OnGetMinionCount -= GetMinionsCount;
             UpgradeController.AddNewMinion -= AddNewMinion;
+            GoldenMinion.OnGoldenMinionClick -= ResetTimer;
         }
 
         private void Start()
         {
-            for (int i = 0; i < _minionsCount; i++)
+            _durationExpectations = 5;
+            _timeIntervalBoost = GetNewTimeIntervalBoost();
+        }
+
+        private void FixedUpdate()
+        {
+            _timeCounter += Time.deltaTime;
+            //використовую оновлення кожну секунду, а не по часу в префабі, щоб згладити данні доходу за кожну секунду
+            if (_timeCounter >= 1)
             {
-                AddNewMinion();
-                _minionsCount--;
+                AddValueToBalance?.Invoke((ulong)(_minion.GetValue() * _minionsCount / _minion.GetIntervalInSeconds()));
+                _timeCounter -= 1;
+            }
+
+            //логіка golden minion
+            _timeIntervalBostCounter += Time.deltaTime;
+            if (_timeIntervalBostCounter >= _timeIntervalBoost && !_isActiveExpectations)
+            {
+                _isActiveExpectations = true;
+                _timeIntervalBostCounter -= _timeIntervalBoost;
+                OnShowGoldenMinion?.Invoke();
+            }
+            else if (_timeIntervalBostCounter >= _durationExpectations && _isActiveExpectations)
+            {
+                _isActiveExpectations = false;
+                _timeIntervalBostCounter -= _durationExpectations;
+                _timeIntervalBoost = GetNewTimeIntervalBoost();
+                OnHideGoldenMinion?.Invoke();
             }
         }
 
-        public ushort GetMinionsCount() => _minionsCount;
-        public void SetMinionsCount(ushort minionsCount)
+        public uint GetMinionsCount() => _minionsCount;
+
+        public void SetMinionsCount(uint minionsCount)
         {
             _minionsCount = minionsCount;
+            OnSetMinions?.Invoke(_minionsCount);
         }
+
         private void AddNewMinion()
         {
             _minionsCount++;
-            RectTransform currentSide = _sides[Random.Range(0, _sides.Count)];
-            _minion.position = new Vector2
-            (
-                Random.Range
-                (
-                    (currentSide.rect.width * -1) / 2,
-                    currentSide.rect.width / 2
-                ),
-                Random.Range
-                (
-                    (currentSide.rect.height * -1) / 2,
-                    currentSide.rect.height / 2
-                )
-            );
-            Instantiate(_minion, currentSide);
+            OnAddNewMinion?.Invoke(false);
         }
 
+        private int GetNewTimeIntervalBoost()
+        {
+            return Random.Range(30, 120);
+        }
+
+        private void ResetTimer()
+        {
+            _isActiveExpectations = false;
+            _timeIntervalBostCounter = 0;
+            _timeIntervalBoost = GetNewTimeIntervalBoost();
+            OnHideGoldenMinion?.Invoke();
+        }
     }
 }
