@@ -33,7 +33,6 @@ namespace Entities
         public void SetRandomTime()
         {
             _timeCounter = Random.Range(0f, _intervalInSeconds);
-            Debug.Log(_timeCounter);
         }
 
         private IEnumerator Play()
