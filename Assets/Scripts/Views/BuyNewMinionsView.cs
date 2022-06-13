@@ -13,16 +13,15 @@ namespace Views
         {
             UpgradeController.UpdateBuyNewMinion += UpdateBuyNewMinion;
         }
-
         private void OnDisable()
         {
             UpgradeController.UpdateBuyNewMinion -= UpdateBuyNewMinion;
         }
 
-        private void UpdateBuyNewMinion(ulong minionCount, ulong costNewMinion)
+        private void UpdateBuyNewMinion(uint minionCount, string costNewMinion)
         {
-            _minionsCountText.text = TextConverter.GetSourceText(minionCount);
-            _costNewMinionText.text = TextConverter.GetSourceText(costNewMinion);
+            _minionsCountText.text = StringArepheticOperations.GetSourceText(minionCount.ToString());
+            _costNewMinionText.text = StringArepheticOperations.GetSourceText(costNewMinion);
         }
     }
 }

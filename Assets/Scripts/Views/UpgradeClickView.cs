@@ -13,15 +13,14 @@ namespace Views
         {
             UpgradeController.UpdateUpgradeClick += UpdateUpgradeClick;
         }
-
         private void OnDisable()
         {
             UpgradeController.UpdateUpgradeClick -= UpdateUpgradeClick;
         }
-        private void UpdateUpgradeClick(ulong powerClick, ulong improvementCostClick)
+        private void UpdateUpgradeClick(string powerClick, string improvementCostClick)
         {
-            _powerClickText.text = TextConverter.GetSourceText(powerClick);
-            _improvementCostClickText.text = TextConverter.GetSourceText(improvementCostClick);
+            _powerClickText.text = StringArepheticOperations.GetSourceText(powerClick);
+            _improvementCostClickText.text = StringArepheticOperations.GetSourceText(improvementCostClick);
         }
     }
 }

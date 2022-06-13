@@ -1,4 +1,5 @@
 using System;
+using Elements;
 using Entities;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -14,9 +15,10 @@ namespace Controllers
         private int _durationExpectations;
         private bool _isActiveExpectations;
         private float _timeIntervalBostCounter;
+        private Boost _boost;
         public static event Action<bool> OnAddNewMinion;
         public static event Action<uint> OnSetMinions;
-        public static event Action<ulong> AddValueToBalance;
+        public static event Action<string> OnAddValueToBalance;
         public static event Action OnShowGoldenMinion;
         public static event Action OnHideGoldenMinion;
 
@@ -30,23 +32,25 @@ namespace Controllers
             UpgradeController.AddNewMinion -= AddNewMinion;
             GoldenMinion.OnGoldenMinionClick -= ResetTimer;
         }
-
         private void Start()
         {
+            _boost = GetComponent<Boost>();
             _durationExpectations = 5;
             _timeIntervalBoost = GetNewTimeIntervalBoost();
         }
-
         private void FixedUpdate()
         {
             _timeCounter += Time.deltaTime;
             //використовую оновлення кожну секунду, а не по часу в префабі, щоб згладити данні доходу за кожну секунду
             if (_timeCounter >= 1)
             {
-                AddValueToBalance?.Invoke((ulong)(_minion.GetValue() * _minionsCount / _minion.GetIntervalInSeconds()));
+                if (_minionsCount > 0)
+                {
+                    OnAddValueToBalance?.Invoke(StringArepheticOperations.MultiplicationOfStrings(_minion.GetValue(), 
+                        _minionsCount / (float)_minion.GetIntervalInSeconds() * _boost.GetBoostValue()));
+                }
                 _timeCounter -= 1;
             }
-
             //логіка golden minion
             _timeIntervalBostCounter += Time.deltaTime;
             if (_timeIntervalBostCounter >= _timeIntervalBoost && !_isActiveExpectations)
@@ -63,26 +67,21 @@ namespace Controllers
                 OnHideGoldenMinion?.Invoke();
             }
         }
-
         public uint GetMinionsCount() => _minionsCount;
-
         public void SetMinionsCount(uint minionsCount)
         {
             _minionsCount = minionsCount;
             OnSetMinions?.Invoke(_minionsCount);
         }
-
         private void AddNewMinion()
         {
             _minionsCount++;
             OnAddNewMinion?.Invoke(false);
         }
-
         private int GetNewTimeIntervalBoost()
         {
             return Random.Range(30, 120);
         }
-
         private void ResetTimer()
         {
             _isActiveExpectations = false;

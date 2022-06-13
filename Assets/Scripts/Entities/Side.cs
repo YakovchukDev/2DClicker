@@ -1,20 +1,15 @@
-using System;
 using UnityEngine;
 
-public class Side : MonoBehaviour
+namespace Entities
 {
-    private RectTransform _rectTransform;
-    private int _minionsInstantiateCount;
-
-    private void Start()
+    public class Side : MonoBehaviour
     {
-        _rectTransform = GetComponent<RectTransform>();
-    }
+        private int _minionsInstantiateCount;
+        public int GetMinionInstantiateCount() => _minionsInstantiateCount;
 
-    public RectTransform GetRectTransform() => _rectTransform;
-    public int GetMinionInstantiateCount() => _minionsInstantiateCount;
-    public void AddMinion()
-    {
-        _minionsInstantiateCount++;
+        public void AddMinion()
+        {
+            _minionsInstantiateCount++;
+        }
     }
 }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Drawing;
 using Controllers;
 using Entities;
 using UnityEngine;
@@ -17,13 +16,11 @@ namespace Views
             MinionController.OnAddNewMinion += AddNewMinion;
             MinionController.OnSetMinions += SetMinions;
         }
-
         private void OnDisable()
         {
             MinionController.OnAddNewMinion -= AddNewMinion;
             MinionController.OnSetMinions -= SetMinions;
         }
-
         private void SetMinions(uint minionsCount)
         {
             //економія ресурсів
@@ -44,30 +41,35 @@ namespace Views
                 }
             }
         }
-
         private void AddNewMinion(bool isRandomTime)
         {
             List<Side> availableSide = new List<Side>();
             foreach (Side side in _sides)
             {
-                if (side.GetRectTransform().GetComponentsInChildren<Minion>().Length <
-                    _minionGridSize.x * _minionGridSize.y)
+                int minionsInSideCount;
+                if (side.GetComponentsInChildren<Minion>() == null)
+                {
+                    minionsInSideCount = 0;
+                }
+                else
+                {
+                    minionsInSideCount = side.GetComponentsInChildren<Minion>().Length;
+                }
+                if ( minionsInSideCount < _minionGridSize.x * _minionGridSize.y)
                 {
                     availableSide.Add(side);
                 }
             }
-
             if (availableSide.Count > 0)
             {
                 Side currentSide = availableSide[Random.Range(0, availableSide.Count)];
-                
-                Minion minion = Instantiate(_minion, currentSide.GetRectTransform());
-                minion.GetRectTransform().anchoredPosition = new Vector2
+                Minion minion = Instantiate(_minion, currentSide.GetComponent<RectTransform>());
+                minion.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2
                 (
-                    currentSide.GetRectTransform().rect.width / _minionGridSize.x * (currentSide.GetMinionInstantiateCount() % _minionGridSize.x) -
-                    currentSide.GetRectTransform().rect.width / 2,
-                    currentSide.GetRectTransform().rect.height / _minionGridSize.y * (_minionGridSize.y - currentSide.GetMinionInstantiateCount() / _minionGridSize.x) -
-                    currentSide.GetRectTransform().rect.height / 2
+                    currentSide.GetComponent<RectTransform>().rect.width / _minionGridSize.x * (currentSide.GetMinionInstantiateCount() % _minionGridSize.x) -
+                        currentSide.GetComponent<RectTransform>().rect.width / 2,
+                    currentSide.GetComponent<RectTransform>().rect.height / _minionGridSize.y * (_minionGridSize.y - currentSide.GetMinionInstantiateCount() / _minionGridSize.x) -
+                        currentSide.GetComponent<RectTransform>().rect.height / 2
                 );
                 if (isRandomTime)
                 {

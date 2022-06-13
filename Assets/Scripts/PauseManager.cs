@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,7 +31,6 @@ public class PauseManager : MonoBehaviour
     {
         Application.Quit();
     }
-
     public void OnChangedMusic()
     {
         if (_musicToggle.isOn)
@@ -44,7 +42,6 @@ public class PauseManager : MonoBehaviour
             _musicCheckBoxImage.sprite = _checkBoxOff;
         }
     }
-
     public void OnChangedSounds()
     {
         if (_soundsToggle.isOn)

@@ -10,15 +10,15 @@ namespace Views
 
         private void OnEnable()
         {
-            BalanceController.UpdateBananasPerSecondView += UpdateBananasPerSecondView;
+            BalanceController.OnUpdateBananasPerSecondView += OnUpdateBananasPerSecondView;
         }
         private void OnDisable()
         {
-            BalanceController.UpdateBananasPerSecondView -= UpdateBananasPerSecondView;
+            BalanceController.OnUpdateBananasPerSecondView -= OnUpdateBananasPerSecondView;
         }
-        private void UpdateBananasPerSecondView(ulong value)
+        private void OnUpdateBananasPerSecondView(string value)
         {
-            _bananasPerSecondsText.text = TextConverter.GetSourceText(value) + "/s";;
+            _bananasPerSecondsText.text = StringArepheticOperations.GetSourceText(value) + "/s";
         }
     }
 }

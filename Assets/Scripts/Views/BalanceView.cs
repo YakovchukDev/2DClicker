@@ -10,16 +10,15 @@ namespace Views
 
         private void OnEnable()
         {
-            BalanceController.UpdateBalanceView += UpdateBalanceView;
+            BalanceController.OnUpdateBalanceView += OnUpdateBalanceView;
         }
         private void OnDisable()
         {
-            BalanceController.UpdateBalanceView -= UpdateBalanceView;
+            BalanceController.OnUpdateBalanceView -= OnUpdateBalanceView;
         }
-        private void UpdateBalanceView(ulong value)
+        private void OnUpdateBalanceView(string value)
         {
-
-            _balanceText.text = TextConverter.GetSourceText(value);
+            _balanceText.text = StringArepheticOperations.GetSourceText(value);
         }
     }
 }

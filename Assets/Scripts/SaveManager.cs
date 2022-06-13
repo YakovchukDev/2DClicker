@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class SaveManager : MonoBehaviour
 {
+    [SerializeField] private bool _testMode;
     [SerializeField] private PlayerController _playerController;
     [SerializeField] private BalanceController _balanceController;
     [SerializeField] private MinionController _minionController;
@@ -17,15 +18,17 @@ public class SaveManager : MonoBehaviour
 
     private void Start()
     {
-        if (_timeInterval == null)
-        {
-            _timeInterval = 10;
-        }
         _time = 0;
-        _path = Application.streamingAssetsPath + "/GameData.json";
+        if (_testMode)
+        {
+            _path = Application.streamingAssetsPath + "/GameData.json";
+        }
+        else
+        {
+            _path = Application.persistentDataPath + "/GameData.json";
+        }
         LoadData();
     }
-
     private void FixedUpdate()
     {
         _time += Time.deltaTime;
@@ -42,17 +45,16 @@ public class SaveManager : MonoBehaviour
             SaveData();
         }
     }
-
     private void OnApplicationQuit()
     {
         SaveData();
     }
-
     private void SaveData()
     {
         if (_gameData != null)
         {
             _gameData.Money = _balanceController.GetBalanceValue();
+            _gameData.NextStage = _balanceController.GetNextstage();
             _gameData.Modifier = _playerController.GetModifier();
             _gameData.MinionsCount = _minionController.GetMinionsCount();
             _gameData.CostOfImprovingClickPower = _upgradeController.GetImprovementCostClick();
@@ -77,6 +79,7 @@ public class SaveManager : MonoBehaviour
             SaveData();
         }
         _balanceController.SetBalanceValue(_gameData.Money);
+        _balanceController.SetNextStage(_gameData.NextStage);
         _playerController.SetModifier(_gameData.Modifier);
         _minionController.SetMinionsCount(_gameData.MinionsCount);
         _upgradeController.SetImprovementCostClick(_gameData.CostOfImprovingClickPower);
@@ -88,21 +91,23 @@ public class SaveManager : MonoBehaviour
     [Serializable]
     private class GameData
     {
-        public ulong Money;
-        public ulong Modifier;
+        public string Money;
+        public string NextStage;
+        public string Modifier;
         public uint MinionsCount;
-        public ulong CostOfImprovingClickPower;
-        public ulong NewMinionCost;
+        public string CostOfImprovingClickPower;
+        public string NewMinionCost;
         public bool MusicToggle;
         public bool SoundsToggle;
 
         public GameData()
         {
-            Money = 0;
-            Modifier = 10;
+            Money = "0";
+            NextStage = "100";
+            Modifier = "10";
             MinionsCount = 0;
-            CostOfImprovingClickPower = 100;
-            NewMinionCost = 100;
+            CostOfImprovingClickPower = "100";
+            NewMinionCost = "100";
             MusicToggle = true;
             SoundsToggle = true;
         }

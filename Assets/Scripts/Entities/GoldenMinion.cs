@@ -26,25 +26,21 @@ namespace Entities
             MinionController.OnShowGoldenMinion += ShowGoldenMinion;
             MinionController.OnHideGoldenMinion += HideGoldenMinion;
         }
-
         private void OnDisable()
         {
             MinionController.OnShowGoldenMinion -= ShowGoldenMinion;
             MinionController.OnHideGoldenMinion -= HideGoldenMinion;
         }
-
         private void Start()
         {
             _goldenMinionRect = GetComponent<RectTransform>();
             _goldenMinionImage = GetComponent<Image>();
         }
-
         public void OnPointerClick(PointerEventData eventData)
         {
             OnStartBoost?.Invoke(_boost, _durationBoost);
             OnGoldenMinionClick?.Invoke();
         }
-
         private void HideGoldenMinion()
         {
             Vector2 position = _goldenMinionRect.anchoredPosition;
@@ -52,7 +48,6 @@ namespace Entities
             _goldenMinionRect.DORotate(new Vector3(0, 0, 0), 1);
             _goldenMinionRect.DOAnchorPos(position, 1.5f);
         }
-
         private void ShowGoldenMinion()
         {
             ResetRect();
@@ -61,7 +56,6 @@ namespace Entities
             _goldenMinionRect.DORotate(new Vector3(0, 0, 30 * _minionSide), 1);
             _goldenMinionRect.DOAnchorPos(position, 1.5f);
         }
-
         private void ResetRect()
         {
             _minionSide = Random.Range(-1, 1) >= 0 ? 1 : -1;
@@ -78,8 +72,11 @@ namespace Entities
                     break;
                 }
             }
-
-            Vector2 position = new Vector2((_mainCanvas.rect.width / 2 + 100) * _minionSide, 500);
+            Vector2 position = new Vector2
+                    (
+                        (_mainCanvas.rect.width / 2 + 100) * _minionSide, 
+                        Random.Range(0, (_mainCanvas.rect.height / 2 - 200))
+                    );
             _goldenMinionRect.anchoredPosition = position;
         }
     }

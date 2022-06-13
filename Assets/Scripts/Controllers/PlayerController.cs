@@ -5,9 +5,9 @@ namespace Controllers
 {
     public class PlayerController : MonoBehaviour
     {
-        public static event Action<ulong> OnSetCurrentModifier;
-        private ulong _currentModifier;
+        private string _currentModifier;
         private float _difference = 1.1f;
+        public static event Action<string> OnSetCurrentModifier;
 
         private void OnEnable()
         {
@@ -17,20 +17,20 @@ namespace Controllers
         {
             UpgradeController.UpgradeClickValue -= UpgradeClickModifier;
         }
-
-        public ulong GetModifier() => _currentModifier;
-        public ulong GetNextClickValue()
+        public string GetModifier() => _currentModifier;
+        public string GetNextClickValue()
         {
-            return (ulong)Math.Round(_currentModifier * _difference);
+            return StringArepheticOperations.MultiplicationOfStrings(_currentModifier, _difference);
         }
-        public void SetModifier(ulong modifier)
+        public void SetModifier(string modifier)
         {
             _currentModifier = modifier;
             OnSetCurrentModifier?.Invoke(_currentModifier);
         }
         private void UpgradeClickModifier()
         {
-            _currentModifier = (ulong)Math.Round(_currentModifier * _difference);
+            _currentModifier = StringArepheticOperations.MultiplicationOfStrings(_currentModifier, _difference);
+            
             OnSetCurrentModifier?.Invoke(_currentModifier);
         }
     }

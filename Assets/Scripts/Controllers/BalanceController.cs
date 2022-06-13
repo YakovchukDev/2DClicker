@@ -1,4 +1,5 @@
 using System;
+using Ads;
 using Entities;
 using Views;
 using UnityEngine;
@@ -8,80 +9,68 @@ namespace Controllers
     public class BalanceController : MonoBehaviour
     {
         [SerializeField] private Minion _minions;
-        [SerializeField]private ulong _balanceCount;
-        private ulong _lastBalanceCount;
+        private string _balanceCount;
+        private string _nextStage;
+        private string _lastBalanceCount;
         private float _incomePerSecondTimeCounter;
-        private int _boost;
-        private int _durationBoost;
-        private float _durationBoostCounter;
-        public static event Action<ulong> UpdateBalanceView;
-        public static event Action<ulong> UpdateBananasPerSecondView;
+        public static event Action<string> OnUpdateBalanceView;
+        public static event Action<string> OnUpdateBananasPerSecondView;
 
         private void OnEnable()
         {
             HorseView.OnHorseClicked += AddValueToBalance;
             UpgradeController.OnBuy += RemoveValueToBalance;
-            MinionController.AddValueToBalance += AddValueToBalance;
-            GoldenMinion.OnStartBoost += SetBoostValue;
+            MinionController.OnAddValueToBalance += AddValueToBalance;
         }
         private void OnDisable()
         {
             HorseView.OnHorseClicked -= AddValueToBalance;
             UpgradeController.OnBuy -= RemoveValueToBalance;
-            MinionController.AddValueToBalance -= AddValueToBalance;
-            GoldenMinion.OnStartBoost -= SetBoostValue;
+            MinionController.OnAddValueToBalance -= AddValueToBalance;
         }
         private void Start()
         {
-            _boost = 1;
+            InterstitialAd.This.LoadAd();
             _lastBalanceCount = _balanceCount;
-            UpdateBalanceView?.Invoke(_balanceCount);
+            OnUpdateBalanceView?.Invoke(_balanceCount);
         }
-
         private void FixedUpdate()
         {
             _incomePerSecondTimeCounter += Time.deltaTime;
             if (_incomePerSecondTimeCounter >= 1f)
             {
                 _incomePerSecondTimeCounter -= 1f;
-                UpdateBananasPerSecondView?.Invoke(_balanceCount - _lastBalanceCount);
+                OnUpdateBananasPerSecondView?.Invoke(StringArepheticOperations.SubtractStrings(_balanceCount, _lastBalanceCount));
                 _lastBalanceCount = _balanceCount;
             }
-
-            if (_boost > 1)
-            {
-                _durationBoostCounter += Time.deltaTime;
-                if (_durationBoostCounter >= _durationBoost)
-                {
-                    _boost = 1;
-                    _durationBoost = 0;
-                    _durationBoostCounter = 0;
-                }
-            }
         }
-
-        public ulong GetBalanceValue() => _balanceCount;
-        public void SetBalanceValue(ulong balanceCount)
+        public string GetBalanceValue() => _balanceCount;
+        public string GetNextstage() => _nextStage;
+        public void SetBalanceValue(string balanceCount)
         {
             _balanceCount = balanceCount;
             _lastBalanceCount = balanceCount;
+            OnUpdateBalanceView?.Invoke(_balanceCount);
         }
-
-        public void SetBoostValue(int boost, int duration)
+        public void SetNextStage(string nextStage)
         {
-            _boost = boost;
-            _durationBoost = duration;
+            _nextStage = nextStage;
         }
-        private void AddValueToBalance(ulong value)
+        private void AddValueToBalance(string value)
         {
-            _balanceCount += value * (ulong)_boost;
-            UpdateBalanceView?.Invoke(_balanceCount);
+            _balanceCount = StringArepheticOperations.SumStrings(_balanceCount, value);
+            OnUpdateBalanceView?.Invoke(_balanceCount);
+            if (StringArepheticOperations.StringsComparison(_balanceCount, _nextStage))
+            {
+                InterstitialAd.This.ShowAd();
+                _nextStage = StringArepheticOperations.MultiplicationOfStrings(_nextStage, 10);
+            }
         }
-        private void RemoveValueToBalance(ulong value)
+        private void RemoveValueToBalance(string value)
         {
-            _balanceCount -= value;
-            _lastBalanceCount -= value;
-            UpdateBalanceView?.Invoke(_balanceCount);
+            _balanceCount = StringArepheticOperations.SubtractStrings(_balanceCount, value);
+            _lastBalanceCount = StringArepheticOperations.SubtractStrings(_lastBalanceCount, value);
+            OnUpdateBalanceView?.Invoke(_balanceCount);
         }
     }
 }

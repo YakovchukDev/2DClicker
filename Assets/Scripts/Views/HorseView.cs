@@ -1,6 +1,6 @@
 using System;
 using Controllers;
-using Entities;
+using Elements;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,8 +9,9 @@ namespace Views
     public class HorseView : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private AddBananasAnimation _addBananasAnimation;
-        private ulong _currentModifier;
-        public static event Action<ulong> OnHorseClicked;
+        private string _currentModifier;
+        private Boost _boost;
+        public static event Action<string> OnHorseClicked;
 
         private void OnEnable()
         {
@@ -20,12 +21,17 @@ namespace Views
         {
             PlayerController.OnSetCurrentModifier += SetCurrentModifier;
         }
+        private void Start()
+        {
+            _boost = GetComponent<Boost>();
+        }
         public void OnPointerClick(PointerEventData eventData)
         {
-            OnHorseClicked?.Invoke(_currentModifier);
-            _addBananasAnimation.Play(_currentModifier);
+            string boostModifier = StringArepheticOperations.MultiplicationOfStrings(_currentModifier, _boost.GetBoostValue());
+            OnHorseClicked?.Invoke(boostModifier);
+            _addBananasAnimation.Play(boostModifier);
         }
-        private void SetCurrentModifier(ulong currentModifier)
+        private void SetCurrentModifier(string currentModifier)
         {
             _currentModifier = currentModifier;
         }
